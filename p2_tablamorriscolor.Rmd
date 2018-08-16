@@ -1,0 +1,154 @@
+---
+title: "Table p2SA"
+author: "Florencia"
+date: "22 de junio de 2018"
+output: word_document
+always_allow_html: yes
+---
+
+```{r setup, include=FALSE}
+#install.packages("kableExtra",dependencies = TRUE)
+#install.packages("formattable")
+#install.packages("devtools")
+#install.packages("stringi")
+#devtools::install_github("haozhu233/kableExtra")
+```
+
+## R Markdown
+
+
+
+
+```{r cars}
+
+#elijo con cual plaguicida trabajo
+
+list<-c("A2", "B2", "J2", "N2", "P2","Ag", "Bg", "Jg", "Ng", "Pg")
+
+tab<-c()
+for(i in list){ 
+  #Leo bases para graficar
+  taba<-read.table(paste("E:/p2_resultados/Morris_final/8Morris/SIMLAB/SIMLABfinales/morris_", i,"", sep=""), skip = 3, fill=TRUE)
+  taba$name<-paste(i)
+  taba$num<-seq(1:nrow(taba))
+  colnames(taba)<-c("var","MUporRO", "SIGMAporRO", "MUporERO", "SIGMAporERO","MUppbRO", "SIGMAppbRO","MUppbERO","SIGMAppbERO","MUave", "SIGMAave","MUpeak", "SIGMApeak","MU4", "SIGMA4","MU60", "SIGMA60", "name", "num")
+  tab<-rbind(tab, taba)
+  colnames(tab)<-c("var","MUporRO", "SIGMAporRO", "MUporERO", "SIGMAporERO","MUppbRO", "SIGMAppbRO","MUppbERO","SIGMAppbERO","MUave", "SIGMAave","MUpeak", "SIGMApeak","MU4", "SIGMA4","MU60", "SIGMA60", "name", "num")
+}
+
+#renombro para poder ordenar mejor en el facet-grid
+tab$name[tab$name=="A2"]<-c("2,4-D Anguil")
+tab$name[tab$name=="P2"]<-c("2,4-D Pergamino")
+tab$name[tab$name=="N2"]<-c("2,4-D Parana")
+tab$name[tab$name=="B2"]<-c("2,4-D Tres Arroyos")
+tab$name[tab$name=="J2"]<-c("2,4-D Marcos Juarez")
+tab$name[tab$name=="Ag"]<-c("Glypho Anguil")
+tab$name[tab$name=="Pg"]<-c("Glypho Pergamino")
+tab$name[tab$name=="Ng"]<-c("Glypho Parana")
+tab$name[tab$name=="Bg"]<-c("Glypho Tres Arroyos")
+tab$name[tab$name=="Jg"]<-c("Glypho Marcos Juarez")
+
+library(kableExtra)
+library(formattable)
+library(knitr)
+library(magrittr)
+
+tab <- tab[,c("MU4", "SIGMA4", "name")]
+tab$MU4 <- round(tab$MU4, digits=2)
+tab$SIGMA4 <- round(tab$SIGMA4, digits=2)
+split_list <- split(tab,tab$name) #separo la tabla en mini listas
+
+#vuelvo a generar la tabla pero uniendola como en columna
+numbers<-seq(1:10)
+group=data.frame(y=seq(1:38))
+for(k in numbers){
+  up<-as.data.frame(split_list[[k]])
+  up<-up[,c("MU4", "SIGMA4")]
+  group<-cbind(group, up)
+}
+group<-group[-1]
+
+#colnames(group)<-c(rep(c("Mu", "Sigma"), 10))
+group$Variable<-as.character(unique(taba$var))
+
+group[group < 1] <- NA #elimino los 0 para que no los rankee
+
+group <- group[-c(34, 37),] #elimino cnb + mnb
+
+#RANK!
+group$MU4[!is.na(group$MU4)]<-rank(-group$MU4, na.last = NA, ties.method = "max")
+group$MU4.1[!is.na(group$MU4.1)]<-rank(-group$MU4.1, na.last = NA, ties.method = "max")
+group$MU4.2[!is.na(group$MU4.2)]<-rank(-group$MU4.2, na.last = NA, ties.method = "max")
+group$MU4.3[!is.na(group$MU4.3)]<-rank(-group$MU4.3, na.last = NA, ties.method = "max")
+group$MU4.4[!is.na(group$MU4.4)]<-rank(-group$MU4.4, na.last = NA, ties.method = "max")
+group$MU4.5[!is.na(group$MU4.5)]<-rank(-group$MU4.5, na.last = NA, ties.method = "max")
+group$MU4.6[!is.na(group$MU4.6)]<-rank(-group$MU4.6, na.last = NA, ties.method = "max")
+group$MU4.7[!is.na(group$MU4.7)]<-rank(-group$MU4.7, na.last = NA, ties.method = "max")
+group$MU4.8[!is.na(group$MU4.8)]<-rank(-group$MU4.8, na.last = NA, ties.method = "max")
+group$MU4.9[!is.na(group$MU4.9)]<-rank(-group$MU4.9, na.last = NA, ties.method = "max")
+group$SIGMA4[!is.na(group$SIGMA4)]<-rank(-group$SIGMA4, na.last = NA, ties.method = "max")
+group$SIGMA4.1[!is.na(group$SIGMA4.1)]<-rank(-group$SIGMA4.1, na.last = NA, ties.method = "max")
+group$SIGMA4.2[!is.na(group$SIGMA4.2)]<-rank(-group$SIGMA4.2, na.last = NA, ties.method = "max")
+group$SIGMA4.3[!is.na(group$SIGMA4.3)]<-rank(-group$SIGMA4.3, na.last = NA, ties.method = "max")
+group$SIGMA4.4[!is.na(group$SIGMA4.4)]<-rank(-group$SIGMA4.4, na.last = NA, ties.method = "max")
+group$SIGMA4.5[!is.na(group$SIGMA4.5)]<-rank(-group$SIGMA4.5, na.last = NA, ties.method = "max")
+group$SIGMA4.6[!is.na(group$SIGMA4.6)]<-rank(-group$SIGMA4.6, na.last = NA, ties.method = "max")
+group$SIGMA4.7[!is.na(group$SIGMA4.7)]<-rank(-group$SIGMA4.7, na.last = NA, ties.method = "max")
+group$SIGMA4.8[!is.na(group$SIGMA4.8)]<-rank(-group$SIGMA4.8, na.last = NA, ties.method = "max")
+group$SIGMA4.9[!is.na(group$SIGMA4.9)]<-rank(-group$SIGMA4.9, na.last = NA, ties.method = "max")
+
+group[is.na(group)]<- " "
+
+library(tidyr)
+library(dplyr)
+ group <- group %>%
+  mutate(MU4 = color_tile("orange", "bisque")(MU4),
+         SIGMA4 = color_tile("orange", "bisque")(SIGMA4),
+         MU4.1 = color_tile("orange", "bisque")(MU4.1),
+         SIGMA4.1= color_tile("orange", "bisque")(SIGMA4.1),
+         MU4.2 = color_tile("orange", "bisque")(MU4.2),
+         SIGMA4.2= color_tile("orange", "bisque")(SIGMA4.2),
+         MU4.3 = color_tile("orange", "bisque")(MU4.3),
+         SIGMA4.3 = color_tile("orange", "bisque")(SIGMA4.3),
+         MU4.4 = color_tile("orange", "bisque")(MU4.4),
+         SIGMA4.4= color_tile("orange", "bisque")(SIGMA4.4),
+         MU4.5 = color_tile("orange", "bisque")(MU4.5),
+         SIGMA4.5= color_tile("orange", "bisque")(SIGMA4.5),
+         MU4.6 = color_tile("orange", "bisque")(MU4.6),
+         SIGMA4.6= color_tile("orange", "bisque")(SIGMA4.6),
+         MU4.7 = color_tile("orange", "bisque")(MU4.7),
+         SIGMA4.7= color_tile("orange", "bisque")(SIGMA4.7),
+         MU4.8 = color_tile("orange", "bisque")(MU4.8),
+         SIGMA4.8= color_tile("orange", "bisque")(SIGMA4.8),
+         MU4.9 = color_tile("orange", "bisque")(MU4.9),
+         SIGMA4.9= color_tile("orange", "bisque")(SIGMA4.9)) %>% 
+   select("Variable", everything()) %>% #cambia el orden de la columna variable
+   rename(Sig=3,Sig=5,Sig=7,Sig=9,Sig=11,Sig=13,Sig=15,Sig=17, Sig=19, Sig=21, Mu =19, Mu = 2, Mu = 4, Mu = 6, Mu = 8, Mu = 10, Mu = 12, Mu = 14, Mu = 16, Mu = 18, Mu = 20 )%>%
+  knitr::kable(escape=FALSE, font_size=5) %>%
+  kable_styling(full_width = FALSE) %>%
+  add_header_above(c("","2,4-D  Anguil"=2, "2,4-D Tres Arroyos"=2, "2,4-D Marcos Juarez"=2,"2,4-D Parana"=2, "2,4-D Pergamino"=2, "Glypho Anguil"=2, "Gly Tres Arroyos"=2, "Gly Marcos Juarez"=2, "Gly Parana"=2, "Gly Pergamino"=2))
+group
+
+export_formattable <- function(group, group.png, width = "100%", height = NULL, 
+                               background = "white", delay = 0.2)
+{
+  w <- as.htmlwidget(group, group.png, width = 750, height = 200)
+  path <- html_print(w, background = "white", viewer = NULL)
+  url <- paste0("file:///", gsub("\\\\", "/", normalizePath("E:/p2_resultados")))
+  webshot(url,
+          file = group.png,
+          selector = ".formattable_widget",
+          delay = 2)
+}
+
+
+
+```
+
+## Including Plots
+
+```{r pressure, echo=FALSE}
+
+```
+
+
